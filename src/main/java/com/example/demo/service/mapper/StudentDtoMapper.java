@@ -20,6 +20,7 @@ public class StudentDtoMapper {
         user.setLastName(student.getUser().getLastName());
         user.setPhoneNumber(student.getUser().getPhoneNumber());
         user.setEmail(student.getUser().getEmail());
+        user.setId(student.getId());
         address.setCity(student.getUser().getAddress().getCity());
         address.setStreet(student.getUser().getAddress().getStreet());
         address.setPostalCode(student.getUser().getAddress().getPostalCode());

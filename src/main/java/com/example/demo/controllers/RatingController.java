@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rating")
 @ResponseBody
+@CrossOrigin("http://localhost:8080")
 public class RatingController {
 
     @Autowired
@@ -21,11 +22,6 @@ public class RatingController {
     @GetMapping("/all")
     public List<RatingDto> getRatings() {
         return ratingService.getRatingDtoList();
-    }
-
-    @GetMapping("/{id}")
-    public RatingDto getRating(@PathVariable int id) {
-        return ratingService.findRating(id);
     }
 
     @PostMapping

@@ -1,13 +1,14 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Lesson;
 import com.example.demo.model.Vehicle;
-import com.example.demo.repository.CourseRepository;
 import com.example.demo.repository.VehicleRepository;
 import com.example.demo.service.dto.VehicleDto;
 import com.example.demo.service.mapper.VehicleDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,7 @@ public class VehicleService {
     private VehicleRepository vehicleRepository;
 
     @Autowired
-    private CourseRepository courseRepository;
+    private LessonService lessonService;
     @Autowired
     private VehicleDtoMapper mapper;
 
@@ -59,19 +60,60 @@ public class VehicleService {
             return vehicleDtoList;
         }else return null;
     }
+    public List<Vehicle> vehicleList(){
+        List<Vehicle> vehicleList = vehicleRepository.findAll();
 
+        if(vehicleList != null) {
+
+            return vehicleList;
+        }else return null;
+    }
+//
+//    public boolean deleteVehicle(Integer vehicleId) {
+//
+//        Vehicle vehicle = findById(vehicleId);
+//        List<Lesson> lessonList = lessonService.findByVehicle(vehicle);
+//        if (vehicle != null && lessonList.isEmpty()){
+//
+//            vehicle.removeCourses();
+//            vehicleRepository.delete(vehicle);
+//            return true;
+//        }
+//
+//        return false;
+//    }
     public boolean deleteVehicle(Integer vehicleId) {
 
-        Vehicle vehicle=findById(vehicleId);
+        Vehicle vehicle = findById(vehicleId);
+        List<Lesson> lessonList = lessonService.findByVehicle(vehicle);
 
-        if(vehicle != null)
-        {
+        int count=0;
+        if (vehicle != null){
+
+            if(lessonList!=null){
+                for(Lesson e: lessonList){
+                    if(e.getDate().isBefore(LocalDate.now())){
+                        count++;
+                    }
+                }
+                if(count==lessonList.size()){
+                    for(Lesson e: lessonList){
+                        lessonService.delete(e);
+                    }
+                    vehicle.removeCourses();
+                    vehicleRepository.delete(vehicle);
+                    return true;
+                }
+                return false;
+            }
             vehicle.removeCourses();
             vehicleRepository.delete(vehicle);
             return true;
         }
+
         return false;
     }
+
 
     public Vehicle updateVehicle(int id, VehicleDto vehicle) {
         Vehicle updatedVehicle = findById(id);

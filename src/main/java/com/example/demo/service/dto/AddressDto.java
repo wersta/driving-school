@@ -18,5 +18,5 @@ public class AddressDto {
     @JsonProperty
     private String street;
     @JsonProperty
-    private int homeNumber;
+    private String homeNumber;
 }

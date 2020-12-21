@@ -30,6 +30,6 @@ public class Lesson {
     @ManyToOne(fetch = FetchType.LAZY)
     private Student student;
 
-    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     private Vehicle vehicle;
 }

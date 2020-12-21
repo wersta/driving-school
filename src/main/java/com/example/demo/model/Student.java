@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,7 +20,7 @@ public class Student {
     @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToMany(mappedBy = "studentList", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "studentList", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Course> courseList;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -31,14 +30,14 @@ public class Student {
     private List<Notification> notificationList;
 
 
-    public void removeCourse(Course course) {
-        this.getCourseList().remove(course);
-        course.getStudentList().remove(this);
-    }
-
-    public void removeCourses() {
-        for (Course course : new ArrayList<>(courseList)) {
-            removeCourse(course);
-        }
-    }
+//    public void removeCourse(Course course) {
+//        this.getCourseList().remove(course);
+//        course.getStudentList().remove(this);
+//    }
+//
+//    public void removeCourses() {
+//        for (Course course : new ArrayList<>(courseList)) {
+//            removeCourse(course);
+//        }
+//    }
 }

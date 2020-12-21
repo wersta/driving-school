@@ -18,6 +18,7 @@ public class InstructorDtoMapper {
 
         user.setFirstName( instructor.getUser().getFirstName());
         user.setLastName(instructor.getUser().getLastName());
+        user.setId(instructor.getId());
         user.setPhoneNumber(instructor.getUser().getPhoneNumber());
         user.setEmail(instructor.getUser().getEmail());
         address.setCity(instructor.getUser().getAddress().getCity());

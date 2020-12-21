@@ -7,6 +7,9 @@ import com.example.demo.service.mapper.LessonDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -39,16 +42,27 @@ public class LessonService {
         }
         return null;
     }
+    public void save(Lesson lesson) {
+        lessonRepository.save(lesson);
+    }
+    public void delete(Lesson lesson) {
+        lessonRepository.delete(lesson);
+    }
 
-    public LessonDto createLesson(LessonDto lessonDto) {
+    public LessonDto createLesson(LessonDto lessonDto, Integer studentId) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm");
         Instructor instructor = instructorService.findById(lessonDto.getInstructorId());
-        Student student = studentService.findById(lessonDto.getStudentId());
+        Student student = studentService.findById(studentId);
         Vehicle vehicle = vehicleService.findById(lessonDto.getVehicleId());
+
+        LocalTime endTime= LocalTime.parse(lessonDto.getEndTime(),format);
+        LocalTime startTime= LocalTime.parse(lessonDto.getStartTime(),format);
 
         Lesson lesson = new Lesson();
         lesson.setId(lessonDto.getId());
-        lesson.setEndTime(lessonDto.getEndTime());
-        lesson.setStartTime(lessonDto.getStartTime());
+        lesson.setEndTime( endTime);
+        lesson.setDate(lessonDto.getDate());
+        lesson.setStartTime(startTime );
         lesson.setPlace(lessonDto.getPlace());
         lesson.setLessonStatus(LessonStatus.WAITING);
         lesson.setVehicle(vehicle);
@@ -61,6 +75,9 @@ public class LessonService {
 
     public List<Lesson> findByInstructor(Instructor instructor) {
         return lessonRepository.findAllByInstructor(instructor);
+    }
+    public List<Lesson> findByVehicle(Vehicle vehicle) {
+        return lessonRepository.findAllByVehicle(vehicle);
     }
 
     public List<Lesson> findByStudent(Student student) {
@@ -86,4 +103,16 @@ public class LessonService {
         }else {return null;}
 
     }
+
+
+    public List<Lesson> findAllByInstructorAndDateOrderByStartTime(Instructor instructor, LocalDate localDate) {
+        return lessonRepository.findAllByInstructorAndDateOrderByStartTimeAsc(instructor, localDate);
+    }
+    public List<Lesson> findAllByInstructorAndLessonStatusAccepted(Instructor instructor, LessonStatus status) {
+        return lessonRepository.findAllByInstructorAndLessonStatus(instructor, status);
+    }
+    public List<Lesson> findAllByInstructorAndLessonStatusWaiting(Instructor instructor,LessonStatus status) {
+        return lessonRepository.findAllByInstructorAndLessonStatus(instructor, status);
+    }
+
 }

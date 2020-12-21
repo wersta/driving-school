@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("http://localhost:8080")
 @RestController
 @RequestMapping("vehicle")
 @ResponseBody
@@ -51,7 +52,7 @@ public class VehicleController {
     public ResponseEntity<?> updateVehicle(@PathVariable Integer vehicleId, @RequestBody VehicleDto vehicle) {
         Vehicle updatedVehicle = vehicleService.updateVehicle(vehicleId, vehicle);
         if(updatedVehicle!=null) {
-            return new ResponseEntity<>(updatedVehicle,HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else  {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }

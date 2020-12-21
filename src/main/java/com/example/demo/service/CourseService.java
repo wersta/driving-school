@@ -13,6 +13,7 @@ import com.example.demo.service.mapper.VehicleDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,6 +66,17 @@ public class CourseService {
         }
         return courseDtoList;
     }
+    public List<CourseDto> getActiveCourses() {
+        List<Course> courseList = courseRepository.findAll();
+        List<CourseDto> courseDtoList = new ArrayList<>();
+        LocalDate date= LocalDate.now();
+        for (Course e : courseList) {
+            if(e.getStartDate().isAfter(date)) {
+                courseDtoList.add(mapper.toDto(e));
+            }
+        }
+        return courseDtoList;
+    }
 
     public Course findById(Integer courseId) {
         return courseRepository.findById(courseId).isPresent() ? courseRepository.findById(courseId).get() : null;
@@ -74,6 +86,11 @@ public class CourseService {
 
         Course course=findById(courseId);
         if(course != null) {
+            for(Student e:course.getStudentList())
+            {
+                e.getCourseList().remove(course);
+                studentService.save(e);
+            }
             courseRepository.delete(course);
             return true;
         }
@@ -91,6 +108,19 @@ public class CourseService {
         }
         return false;
     }
+    public List<VehicleDto> showAvailableVehicles(Integer courseId) {
+        Course course = findById(courseId);
+        List<Vehicle> vehicleList=vehicleService.vehicleList();
+        for(Vehicle e:vehicleService.vehicleList()){
+            for(Course c:e.getCourseList()){
+                if(courseId.equals(c.getId())){
+                    vehicleList.remove(e);
+                }
+            }
+        }
+        return vehicleMapper.toDtoVehicleList(vehicleList);
+    }
+
 
     public boolean deleteVehicleFromCourse(Integer courseId, Integer vehicleId) {
         Course course = findById(courseId);
@@ -102,6 +132,9 @@ public class CourseService {
             return true;
         }
         return false;
+    }
+    public void save(Course course) {
+        courseRepository.save(course);
     }
 
     public boolean deleteStudentFromCourse(Integer courseId, Integer studentId) {
@@ -115,8 +148,8 @@ public class CourseService {
         }
         return false;
     }
-    public boolean addStudentToCourse(Integer courseId, Integer studentId) {
-        Course course = findById(courseId);
+    public boolean addStudentToCourse(CourseDto courseDto, Integer studentId) {
+        Course course = findById(courseDto.getId());
         Student student = studentService.findById(studentId);
 
         if (course != null && student != null) {
@@ -129,18 +162,12 @@ public class CourseService {
 
     public Course updateCourse(int id, CourseDto course) {
         Course updatedCourse = findById(id);
-        Course newCourse = mapper.toEntity(course);
 
-        if (newCourse.getName() != null)
-            updatedCourse.setName(newCourse.getName());
-        if (newCourse.getCourseType() != null)
-            updatedCourse.setCourseType(newCourse.getCourseType());
-        if (newCourse.getHours() != 0)
-            updatedCourse.setHours(newCourse.getHours());
-        if (newCourse.getStartDate() != null)
-            updatedCourse.setStartDate(newCourse.getStartDate());
-        if (newCourse.getPrice() != 0)
-            updatedCourse.setPrice(newCourse.getPrice());
+        updatedCourse.setName(course.getName());
+        updatedCourse.setCourseType(course.getCourseType());
+        updatedCourse.setHours(course.getHours());
+        updatedCourse.setStartDate(course.getStartDate());
+        updatedCourse.setPrice(course.getPrice());
 
         courseRepository.save(updatedCourse);
         return updatedCourse;

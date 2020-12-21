@@ -1,13 +1,9 @@
 package com.example.demo.controllers;
 
-import com.example.demo.model.Address;
 import com.example.demo.model.Notification;
 import com.example.demo.model.Student;
 import com.example.demo.service.StudentService;
-import com.example.demo.service.dto.CourseDto;
-import com.example.demo.service.dto.LessonDto;
-import com.example.demo.service.dto.UserDto;
-import com.example.demo.service.dto.UserSecondDto;
+import com.example.demo.service.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
-@RequestMapping("student")
+@RequestMapping("/student")
 @ResponseBody
+@CrossOrigin(origins="http://localhost:8080", allowedHeaders = "*")
 public class StudentController {
 
     @Autowired
@@ -29,7 +27,7 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public UserSecondDto getStudent(@PathVariable int id) {
+    public UserSecondDto getStudent(@PathVariable Integer id) {
         return studentService.findStudent(id);
     }
 
@@ -43,20 +41,26 @@ public class StudentController {
     public List<LessonDto> getLessonsFromSpecificStudent(@PathVariable Integer studentId) {
         return studentService.lessonList(studentId);
     }
-    @GetMapping("/notification/{studentId}")
-    public List<Notification> getAllNotifications(@PathVariable Integer studentId) {
-        return studentService.findAllNotifications(studentId);
-    }
 
-    @GetMapping("/notification/unread/{studentId}")
+    @GetMapping("/notification/{studentId}")
     public List<Notification> getUnreadNotifications(@PathVariable Integer studentId) {
         return studentService.findAllUnread(studentId);
     }
+    @PatchMapping("notification/read/{studentId}")
+    public ResponseEntity<?> readNotification(@PathVariable Integer studentId, @RequestBody NotificationDto dto) {
 
-    @PostMapping
-    public ResponseEntity<HttpStatus> createStudent(@RequestBody UserDto userDto) {
-        if (studentService.createStudent(userDto) != null) {
+        if (studentService.read(studentId, dto)) {
             return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+        }
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> createStudent(@RequestBody UserDto userDto) {
+        LoginDto loginDto=studentService.createStudent(userDto);
+        if (loginDto != null) {
+            return new ResponseEntity<>(loginDto,HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
@@ -70,22 +74,26 @@ public class StudentController {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
-    @PutMapping("/{studentId}")
-    public ResponseEntity<?> updateStudent(@PathVariable Integer studentId, @RequestBody String firstName, String lastName, String email, String phoneNumber) {
-        Student updatedVehicle = studentService.updateStudent(studentId, firstName,lastName,email,phoneNumber);
-        if(updatedVehicle!=null) {
-            return new ResponseEntity<>(updatedVehicle,HttpStatus.OK);
-        } else  {
+
+    @PatchMapping("/{studentId}")
+    public ResponseEntity<?> updateStudent(@PathVariable Integer studentId, @RequestBody UserSecondDto dto) {
+
+        Student updatedVehicle = studentService.updateStudent(studentId, dto);
+
+        if (updatedVehicle != null) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
-    @PutMapping("/changeAddress/{studentId}")
-    public ResponseEntity<?> updateStudentAddress(@PathVariable Integer studentId, @RequestBody Address address) {
-        try {
-            studentService.updateStudentAddress(studentId, address);
+
+    @PatchMapping("changePassword/{studentId}")
+    public ResponseEntity<?> changePassword(@PathVariable Integer studentId, @RequestBody UserDto dto) {
+        if (studentService.changePassword(studentId, dto)) {
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e){
-           return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
+
 }

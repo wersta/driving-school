@@ -11,5 +11,4 @@ public interface VehicleRepository extends CrudRepository<Vehicle,Integer> {
 
     List<Vehicle> findAll();
 
-
 }

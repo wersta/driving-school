@@ -12,7 +12,7 @@ public class RatingDtoMapper {
 
     public RatingDto toDto(Rating rating)
     {
-        return new RatingDto(rating.getId(), rating.getDescription(), rating.getStarsNumber(), rating.getInstructor().getId());
+        return new RatingDto(rating.getId(), rating.getDate(),rating.getDescription(), rating.getStarsNumber(), rating.getInstructor().getId());
     }
 
     public List<RatingDto> toDtoRatingList(List<Rating>ratingsList )

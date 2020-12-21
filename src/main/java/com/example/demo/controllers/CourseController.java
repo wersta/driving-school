@@ -1,19 +1,19 @@
 package com.example.demo.controllers;
 
-import com.example.demo.service.dto.VehicleDto;
 import com.example.demo.model.Course;
 import com.example.demo.service.CourseService;
 import com.example.demo.service.dto.CourseDto;
 import com.example.demo.service.dto.UserSecondDto;
+import com.example.demo.service.dto.VehicleDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@CrossOrigin
+@CrossOrigin(origins="http://localhost:8080")
 @RestController
-@RequestMapping("course")
+@RequestMapping("/course")
 public class CourseController {
 
     @Autowired
@@ -21,6 +21,10 @@ public class CourseController {
 
     @GetMapping("/all")
     public List<CourseDto> getCourses() { return courseService.getCourseDtoList(); }
+
+    @GetMapping("/current")
+    public List<CourseDto> getCoursesByCategory()
+    { return courseService.getActiveCourses(); }
 
     @GetMapping("/{courseId}")
     public CourseDto getCourse(@PathVariable(value = "courseId") Integer courseId) {
@@ -36,6 +40,10 @@ public class CourseController {
     public List<UserSecondDto> getStudentsFromSpecificCourse(@PathVariable Integer courseId) {
         return courseService.studentList(courseId);
     }
+    @GetMapping("/availableVehicles/{courseId}")
+    public List<VehicleDto> getAvailableVehicles(@PathVariable Integer courseId) {
+        return courseService.showAvailableVehicles(courseId);
+    }
 
     @PostMapping
     public ResponseEntity<?> createCourse(@RequestBody CourseDto courseDto) {
@@ -46,8 +54,8 @@ public class CourseController {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
-    @PostMapping("/addVehicle")
-    public ResponseEntity<HttpStatus> addVehicleToCourse(@RequestParam Integer courseId, @RequestParam Integer vehicleId) {
+    @PostMapping("/addVehicle/{courseId}/{vehicleId}")
+    public ResponseEntity<HttpStatus> addVehicleToCourse(@PathVariable Integer courseId, @PathVariable Integer vehicleId) {
         if (courseService.addVehicleToCourse(courseId, vehicleId)) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
@@ -55,9 +63,9 @@ public class CourseController {
         }
     }
 
-    @PostMapping("/addStudent")
-    public ResponseEntity<HttpStatus> addStudentToCourse(@RequestParam Integer courseId, @RequestParam Integer studentId) {
-        if (courseService.addStudentToCourse(courseId, studentId)) {
+    @PostMapping("/addStudent/{studentId}")
+    public ResponseEntity<HttpStatus> addStudentToCourse(@RequestBody CourseDto course, @PathVariable Integer studentId) {
+        if (courseService.addStudentToCourse(course, studentId)) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
@@ -82,20 +90,20 @@ public class CourseController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteCourse(@PathVariable Integer id) {
-        if (courseService.deleteCourse(id)) {
+    @DeleteMapping("/{courseId}")
+    public ResponseEntity<HttpStatus> deleteCourse(@PathVariable Integer courseId) {
+        if (courseService.deleteCourse(courseId)) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateCourse(@PathVariable(value = "id") int id, @RequestBody CourseDto course) {
-        Course updatedCourse = courseService.updateCourse(id, course);
+    @PutMapping("/{courseId}")
+    public ResponseEntity<?> updateCourse(@PathVariable Integer courseId, @RequestBody CourseDto course) {
+        Course updatedCourse = courseService.updateCourse(courseId, course);
         if(updatedCourse!=null) {
-            return new ResponseEntity<>(updatedCourse,HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else  {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }

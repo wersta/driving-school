@@ -2,10 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.*;
 import com.example.demo.repository.StudentRepository;
-import com.example.demo.service.dto.CourseDto;
-import com.example.demo.service.dto.LessonDto;
-import com.example.demo.service.dto.UserDto;
-import com.example.demo.service.dto.UserSecondDto;
+import com.example.demo.service.dto.*;
 import com.example.demo.service.mapper.CourseDtoMapper;
 import com.example.demo.service.mapper.LessonDtoMapper;
 import com.example.demo.service.mapper.StudentDtoMapper;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,7 +25,8 @@ public class StudentService {
     private AddressService addressService;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private CourseService courseService;
     @Autowired
     private StudentDtoMapper mapper;
 
@@ -44,12 +43,20 @@ public class StudentService {
     @Autowired
     private NotificationService notificationService;
 
-    public Student createStudent(UserDto userDto) {
+    public LoginDto createStudent(UserDto userDto) {
+
         userDto.setUserRole(UserRole.STUDENT);
+        //zakodowac hasło potem tu
         User user = userService.createUser(userDto);
         Student student = new Student(null, user, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         studentRepository.save(student);
-        return student;
+        String email=user.getEmail();
+        String password=user.getPassword();
+
+        String encodeBytes = Base64.getEncoder().encodeToString((email + ":" + password).getBytes());
+        String token="Basic ".concat(encodeBytes);
+        LoginDto loginDto=new LoginDto(token,UserRole.STUDENT);
+        return loginDto;
     }
 
     public Student findById(Integer studentId) {
@@ -60,7 +67,12 @@ public class StudentService {
         Student student = findById(studentId);
 
         if (student != null) {
-            student.removeCourses();
+            for(Course e: student.getCourseList())
+            {
+                e.getStudentList().remove(student);
+                courseService.save(e);
+
+            }
             studentRepository.delete(student);
             return true;
         }
@@ -117,16 +129,15 @@ public class StudentService {
         return false;
     }
 
-    public void check(Integer studentId) {
-        Student student = findById(studentId);
+    public void check(Student student) {
         if (student != null) {
             List<Lesson> lessonList = lessonService.findByStudent(student);
             LocalDate date = LocalDate.now().plusDays(1);
 
             for (Lesson e : lessonList) {
-                if (e.getDate().equals(date)) {
-                    String description = "Czas rozpoczęcia: " + e.getStartTime() + ". Miejsce spotkania: " + e.getPlace();
-                    Notification notification = new Notification(null, "powiadomienie", description, false);
+                if (e.getDate().equals(date) && e.getLessonStatus().equals(LessonStatus.ACCEPTED)) {
+                    String description = "Data zajęć: "+ e.getDate()+". Czas rozpoczęcia: " + e.getStartTime() + ". Miejsce spotkania: " + e.getPlace();
+                    Notification notification = new Notification(null, "Przypomienie o zajęciach!", description, false);
                     notificationService.save(notification);
                     addNotification(student, notification);
                 }
@@ -139,55 +150,83 @@ public class StudentService {
         Lesson lesson = new Lesson();
         for (Lesson e : student.getLessonList()) {
             if (e.getId() == lessonId) {
-                lesson=e;
+                lesson = e;
             }
         }
         return lesson;
     }
-    public List<Notification> findAllNotifications(Integer studentId) {
-
-        Student student = findById(studentId);
-        if(student!=null) {
-            return student.getNotificationList();
-        }else{
-            return null;}
-    }
 
     public List<Notification> findAllUnread(Integer studentId) {
         Student student = findById(studentId);
-        if(student != null) {
+        if (student != null) {
             List<Notification> notificationList = new ArrayList<>();
             for (Notification e : student.getNotificationList()) {
                 if (!e.isNotificationStatus()) notificationList.add(e);
             }
-
             return notificationList;
-        }else{
-            return null; }
+        } else {
+            return null;
+        }
+    }
+    public boolean read(Integer studentId, NotificationDto dto) {
+        Student student = findById(studentId);
+        if (student != null) {
+            List<Notification> notificationList = new ArrayList<>();
+            for (Notification e : student.getNotificationList()) {
+                if (e.getId().equals(dto.getId())) {
+                    e.setNotificationStatus(true);
+                    notificationService.save(e);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    public Student updateStudent(int id,  String firstName,String lastName,String email,String phoneNumber) {
-        Student updatedStudent = findById(id);
+    public Student updateStudent(int id, UserSecondDto dto) {
+        if (findById(id) != null) {
+            Student updatedStudent = findById(id);
 
-        if (firstName!=null)
-            updatedStudent.getUser().setFirstName(firstName);
-        if (lastName!=null)
-            updatedStudent.getUser().setLastName(lastName);
-        if (email!=null)
-            updatedStudent.getUser().setEmail(email);
-        if (phoneNumber!=null)
-            updatedStudent.getUser().setPhoneNumber(phoneNumber);
+            Address address = addressService.findById(updatedStudent.getUser().getAddress().getId());
+            address.setHomeNumber(dto.getAddress().getHomeNumber());
+            address.setPostalCode(dto.getAddress().getPostalCode());
+            address.setStreet(dto.getAddress().getStreet());
+            address.setCity(dto.getAddress().getCity());
+            addressService.saveAddress(address);
 
-        studentRepository.save(updatedStudent);
-        return updatedStudent;
+            User user = userService.findById(updatedStudent.getUser().getId());
+            user.setFirstName(dto.getFirstName());
+            user.setLastName(dto.getLastName());
+            user.setEmail(dto.getEmail());
+            user.setPhoneNumber(dto.getPhoneNumber());
+            userService.save(user);
+
+            return updatedStudent;
+        } else {
+            return null;
+        }
     }
-    public void updateStudentAddress(int id, Address address) {
-        Student updatedStudent = findById(id);
 
-        updatedStudent.getUser().setAddress(address);
-        addressService.saveAddress(address);
-        studentRepository.save(updatedStudent);
 
+    public Student findByUserId(Integer userId) {
+        return studentRepository.findByUser_Id(userId).isPresent() ? studentRepository.findByUser_Id(userId).get() : null;
     }
 
+    public Integer findStudentId(String email){
+        int userId=userService.findStudentOrInstructor(email);
+        Student student=findByUserId(userId);
+        return student.getId();
+    }
+    public boolean changePassword( Integer studentId, UserDto dto){
+        Student student=findById(studentId);
+        if(student != null) {
+            student.getUser().setPassword(dto.getPassword());
+            studentRepository.save(student);
+            return true;
+        }else
+        return false;
+    }
+    public void save(Student student) {
+        studentRepository.save(student);
+    }
 }

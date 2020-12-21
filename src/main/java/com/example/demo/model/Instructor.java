@@ -28,4 +28,7 @@ public class Instructor {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Notification> notificationList;
+
+
+
 }

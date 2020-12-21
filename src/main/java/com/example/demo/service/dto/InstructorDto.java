@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class InstructorDto {
 
     private UserSecondDto user;
+    //private String description;
 }

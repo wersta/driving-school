@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,8 +16,10 @@ import java.time.LocalTime;
 public class LessonDto {
 
     private Integer id;
-    private LocalTime startTime;
-    private LocalTime endTime;
+//    private LocalTime startTime;
+//    private LocalTime endTime;
+    private String startTime;
+    private String endTime;
     private String place;
     private LocalDate date;
     private LessonStatus lessonStatus;

@@ -33,6 +33,7 @@ public class RatingService {
         Rating rating=new Rating();
         rating.setDescription(ratingDto.getDescription());
         rating.setId(ratingDto.getId());
+        rating.setDate(ratingDto.getDate());
         rating.setStarsNumber(ratingDto.getStarsNumber());
         Instructor instructor=instructorService.findById(ratingDto.getInstructorId());
         rating.setInstructor(instructor);
