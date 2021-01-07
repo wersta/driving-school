@@ -8,15 +8,15 @@
         <version>2.3.4.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>demo.pl.drivingSchool</groupId>
-    <artifactId>demo</artifactId>
+    <groupId>pl.polsl.staneczek</groupId>
+    <artifactId>staneczek</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>drivingSchool</name>
     <description>Driving school application</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11.0.9</java.version>
     </properties>
 
     <dependencies>
@@ -57,12 +57,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>2.2.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

@@ -28,7 +28,7 @@ public class InstructorController {
         return instructorService.instructorToList();
     }
 
-    @GetMapping("/{instructorId}")
+    @GetMapping("/find/{instructorId}")
     public UserSecondDto getInstructor(@PathVariable Integer instructorId) {
         return instructorService.findInstructor(instructorId);
     }
@@ -38,10 +38,7 @@ public class InstructorController {
     public List<LessonDto> getLessons(@PathVariable Integer instructorId) {
         return instructorService.lessonList(instructorId);
     }
-//       @GetMapping("/lesson/accepted/{instructorId}")
-//    public List<LessonDto> getAcceptedLessons(@PathVariable Integer instructorId) {
-//        return instructorService.acceptedLessonList(instructorId);
-//    }
+
     @GetMapping("/lesson/waiting/{instructorId}")
     public List<LessonDto> getWaitingLessons(@PathVariable Integer instructorId) {
         return instructorService.waitingLessonList(instructorId);
@@ -87,10 +84,7 @@ public class InstructorController {
     public float getAverageRating(@PathVariable Integer instructorId) {
         return instructorService.averageRating(instructorId);
     }
-//    @GetMapping("/shwoRatings/{email}")
-//    public List<RatingDto> getRatingsFromInstructor(@PathVariable String email) {
-//        return instructorService.findInstructorRatingsByEmail(email);
-//    }
+
     @PatchMapping("/{instructorId}")
     public ResponseEntity<?> updateInstructor(@PathVariable Integer instructorId, @RequestBody UserSecondDto dto) {
 

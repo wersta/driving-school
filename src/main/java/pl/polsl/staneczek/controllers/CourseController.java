@@ -47,9 +47,9 @@ public class CourseController {
 
     @PostMapping
     public ResponseEntity<?> createCourse(@RequestBody CourseDto courseDto) {
-        CourseDto newCourse=courseService.createCourse(courseDto);
+        Course newCourse=courseService.createCourse(courseDto);
         if (newCourse != null) {
-            return new ResponseEntity<>(newCourse, HttpStatus.OK);
+            return new ResponseEntity<>( HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }

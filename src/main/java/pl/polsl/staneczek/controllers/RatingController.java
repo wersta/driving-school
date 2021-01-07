@@ -1,12 +1,13 @@
 package pl.polsl.staneczek.controllers;
 
 
-import pl.polsl.staneczek.service.RatingService;
-import pl.polsl.staneczek.service.dto.RatingDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.polsl.staneczek.model.Rating;
+import pl.polsl.staneczek.service.RatingService;
+import pl.polsl.staneczek.service.dto.RatingDto;
 
 import java.util.List;
 
@@ -24,11 +25,11 @@ public class RatingController {
         return ratingService.getRatingDtoList();
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<?> createRating(@RequestBody RatingDto ratingDto) {
-        RatingDto newRating=ratingService.createRating(ratingDto);
+        Rating newRating=ratingService.createRating(ratingDto);
         if (newRating != null) {
-            return new ResponseEntity<>(newRating, HttpStatus.OK);
+            return new ResponseEntity<>( HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }

@@ -30,22 +30,5 @@ public class LessonController {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
-//    @PutMapping("/accept/{lessonId}")
-//    public ResponseEntity<?> acceptLesson(@PathVariable Integer lessonId) {
-//        LessonDto lesson=lessonService.acceptLesson(lessonId);
-//        if (lesson != null) {
-//            return new ResponseEntity<>(lesson, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
-//        }
-//    }
-//    @PutMapping("/deny/{lessonId}")
-//    public ResponseEntity<?> denyLesson(@PathVariable Integer lessonId) {
-//        LessonDto lesson=lessonService.denyLesson(lessonId);
-//        if (lesson != null) {
-//            return new ResponseEntity<>(lesson, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
-//        }
-//    }
+
 }

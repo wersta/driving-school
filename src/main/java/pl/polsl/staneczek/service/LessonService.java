@@ -84,33 +84,11 @@ public class LessonService {
         return lessonRepository.findAllByStudent(student);
     }
 
-    public LessonDto acceptLesson(Integer lessonId) {
-        Lesson updatedLesson=findById(lessonId);
-        if(updatedLesson!=null) {
-            updatedLesson.setLessonStatus(LessonStatus.ACCEPTED);
-            lessonRepository.save(updatedLesson);
-            return lessonMapper.toDto(updatedLesson);
-        }else
-            {return null;}
-
-    }
-    public LessonDto denyLesson(Integer lessonId) {
-        Lesson updatedLesson=findById(lessonId);
-        if(updatedLesson!=null) {
-            updatedLesson.setLessonStatus(LessonStatus.DENIED);
-            lessonRepository.save(updatedLesson);
-            return lessonMapper.toDto(updatedLesson);
-        }else {return null;}
-
-    }
-
 
     public List<Lesson> findAllByInstructorAndDateOrderByStartTime(Instructor instructor, LocalDate localDate) {
         return lessonRepository.findAllByInstructorAndDateOrderByStartTimeAsc(instructor, localDate);
     }
-    public List<Lesson> findAllByInstructorAndLessonStatusAccepted(Instructor instructor, LessonStatus status) {
-        return lessonRepository.findAllByInstructorAndLessonStatus(instructor, status);
-    }
+
     public List<Lesson> findAllByInstructorAndLessonStatusWaiting(Instructor instructor,LessonStatus status) {
         return lessonRepository.findAllByInstructorAndLessonStatus(instructor, status);
     }

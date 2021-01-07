@@ -1,12 +1,12 @@
 package pl.polsl.staneczek.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import pl.polsl.staneczek.model.Lesson;
 import pl.polsl.staneczek.model.Vehicle;
 import pl.polsl.staneczek.repository.VehicleRepository;
 import pl.polsl.staneczek.service.dto.VehicleDto;
 import pl.polsl.staneczek.service.mapper.VehicleDtoMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,14 +30,15 @@ public class VehicleService {
 
     public VehicleDto findOne(Integer vehicleId)
     {
-        Vehicle vehicle=findById(vehicleId);
+        Vehicle vehicle = findById(vehicleId);
         if(vehicle != null) {
             return mapper.toDto(vehicle);
         }
         return null;
     }
 
-    public VehicleDto create(VehicleDto dto) {
+    public Vehicle create(VehicleDto dto) {
+
         Vehicle vehicle = new Vehicle();
         vehicle.setId(dto.getId());
         vehicle.setBrand(dto.getBrand());
@@ -46,7 +47,7 @@ public class VehicleService {
         vehicle.setCourseList(Collections.emptyList());
         vehicleRepository.save(vehicle);
 
-        return mapper.toDto(vehicle);
+        return vehicle;
     }
 
     public List<VehicleDto> vehicleDtoList(){
@@ -62,26 +63,11 @@ public class VehicleService {
     }
     public List<Vehicle> vehicleList(){
         List<Vehicle> vehicleList = vehicleRepository.findAll();
-
         if(vehicleList != null) {
-
             return vehicleList;
         }else return null;
     }
-//
-//    public boolean deleteVehicle(Integer vehicleId) {
-//
-//        Vehicle vehicle = findById(vehicleId);
-//        List<Lesson> lessonList = lessonService.findByVehicle(vehicle);
-//        if (vehicle != null && lessonList.isEmpty()){
-//
-//            vehicle.removeCourses();
-//            vehicleRepository.delete(vehicle);
-//            return true;
-//        }
-//
-//        return false;
-//    }
+
     public boolean deleteVehicle(Integer vehicleId) {
 
         Vehicle vehicle = findById(vehicleId);

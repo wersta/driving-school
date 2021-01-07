@@ -46,14 +46,16 @@ public class StudentService {
     public LoginDto createStudent(UserDto userDto) {
 
         userDto.setUserRole(UserRole.STUDENT);
-        //zakodowac hasło potem tu
+
         User user = userService.createUser(userDto);
         Student student = new Student(null, user, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         studentRepository.save(student);
         String email=user.getEmail();
-        String password=user.getPassword();
 
-        String encodeBytes = Base64.getEncoder().encodeToString((email + ":" + password).getBytes());
+        byte[] decodedBytes = Base64.getDecoder().decode(user.getPassword());
+        String userPassword = new String(decodedBytes);
+
+        String encodeBytes = Base64.getEncoder().encodeToString((email + ":" + userPassword).getBytes());
         String token="Basic ".concat(encodeBytes);
         LoginDto loginDto=new LoginDto(token,UserRole.STUDENT);
         return loginDto;
@@ -220,7 +222,8 @@ public class StudentService {
     public boolean changePassword( Integer studentId, UserDto dto){
         Student student=findById(studentId);
         if(student != null) {
-            student.getUser().setPassword(dto.getPassword());
+            String encodePassword = Base64.getEncoder().encodeToString((dto.getPassword()).getBytes());
+            student.getUser().setPassword(encodePassword);
             studentRepository.save(student);
             return true;
         }else

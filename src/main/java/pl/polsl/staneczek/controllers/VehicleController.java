@@ -24,16 +24,16 @@ public class VehicleController {
         return vehicleService.vehicleDtoList();
     }
 
-    @GetMapping("/{vehicleId}")
+    @GetMapping("/find/{vehicleId}")
     public VehicleDto getVehicle(@PathVariable(value = "vehicleId") Integer vehicleId) {
         return vehicleService.findOne(vehicleId);
     }
 
     @PostMapping
     public ResponseEntity<?> createVehicle(@RequestBody VehicleDto vehicleDto) {
-        VehicleDto newVehicle=vehicleService.create(vehicleDto);
+        Vehicle newVehicle=vehicleService.create(vehicleDto);
         if (newVehicle != null) {
-            return new ResponseEntity<>(newVehicle,HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }

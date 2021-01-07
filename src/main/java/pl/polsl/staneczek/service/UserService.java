@@ -25,7 +25,7 @@ public class UserService {
             user.setLastName(userDto.getLastName());
             user.setEmail(userDto.getEmail());
             String encodePassword = Base64.getEncoder().encodeToString((userDto.getPassword()).getBytes());
-            user.setPassword(userDto.getPassword());
+            user.setPassword(encodePassword);
             user.setPhoneNumber(userDto.getPhoneNumber());
             user.setUserRole(userDto.getUserRole());
             user.setAddress(userDto.getAddress());

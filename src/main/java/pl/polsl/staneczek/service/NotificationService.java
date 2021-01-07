@@ -30,7 +30,7 @@ public class NotificationService {
         if (lesson.getLessonStatus() == LessonStatus.ACCEPTED) {
             notification = new Notification(null, "Status lekcji jazdy", "Zaakceptowano! Data lekcji: "+lesson.getDate() +" Miejsce: "+lesson.getPlace()+ " Instruktor: "+lesson.getInstructor().getUser().getFirstName()+ " "+lesson.getInstructor().getUser().getLastName(), false);
         } else {
-            notification = new Notification(null, "Status lekcji jazdy", "Odrzucono! Data lekcji: "+lesson.getDate(), false);
+            notification = new Notification(null, "Status lekcji jazdy", "Odrzucono! Data lekcji: "+lesson.getDate()+" Miejsce: "+lesson.getPlace()+ " Instruktor: "+lesson.getInstructor().getUser().getFirstName()+ " "+lesson.getInstructor().getUser().getLastName(), false);
         }
 
         notificationRepository.save(notification);

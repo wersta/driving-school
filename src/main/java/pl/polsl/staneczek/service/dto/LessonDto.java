@@ -16,8 +16,6 @@ import java.time.LocalDate;
 public class LessonDto {
 
     private Integer id;
-//    private LocalTime startTime;
-//    private LocalTime endTime;
     private String startTime;
     private String endTime;
     private String place;

@@ -5,6 +5,7 @@ import pl.polsl.staneczek.model.Course;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -31,6 +32,8 @@ public class CourseDtoMapper {
         course.setStartDate(courseDto.getStartDate());
         course.setCourseType(courseDto.getCourseType());
         course.setHours(courseDto.getHours());
+        course.setVehicleList(Collections.emptyList());
+        course.setStudentList(Collections.emptyList());
 
         return course;
     }

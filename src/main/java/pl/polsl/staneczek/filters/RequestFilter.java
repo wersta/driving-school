@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Base64;
 
 @Component
 public class RequestFilter implements Filter {
@@ -32,23 +33,29 @@ public class RequestFilter implements Filter {
         String redirectURI = new String(((HttpServletRequest) servletRequest).getRequestURI());
         StringBuffer redirectURL = new StringBuffer(((HttpServletRequest) servletRequest).getRequestURL().toString());
 
-        if(redirectURI.contains("/login") ||redirectURI.equals("/vehicle/all/")||redirectURI.equals("/student/add")  || redirectURI.equals("/course/active")){
+        if(redirectURI.contains("/login") || redirectURI.equals("/student/add")  || redirectURI.equals("/course/current")){
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-
         String authHeader = ((HttpServletRequest) servletRequest).getHeader("Authorization");
+
         if (authHeader != null) {
-            System.out.println(authHeader);
+
             String usernameAndPassHash = authHeader.split(" ")[1];
             String usernameAndPass = new String(Base64Coder.decodeString(usernameAndPassHash));
             String email = usernameAndPass.split(":")[0];
             String password = usernameAndPass.split(":")[1];
             User user = userService.findByEmail(email);
-
-            if (email.equals(user.getEmail()) && password.equals(user.getPassword())) {
+            byte[] decodedBytes = Base64.getDecoder().decode(user.getPassword());
+            String userPassword = new String(decodedBytes);
+            if (email.equals(user.getEmail()) && password.equals(userPassword)) {
                 if (user.getUserRole().equals(UserRole.ADMIN)){
+                    if(redirectURI.contains("/student/notification") || redirectURI.contains("/instructor/notification") ||redirectURI.contains("/lesson") ||redirectURI.contains("/student/lesson") ||redirectURI.contains("/instructor/lesson") )
+                    {
+                        ((HttpServletResponse) servletResponse).sendError(401, "Unauthorized");
+                    }else{
                     filterChain.doFilter(servletRequest, servletResponse);
+                    }
                 }
                 Student student = studentService.findByUserId(user.getId());
                 Instructor instructor=instructorService.findByUserId(user.getId());
@@ -65,15 +72,18 @@ public class RequestFilter implements Filter {
                                 return redirectURI.concat(studentId);
                                 }
                             }, servletResponse);
-                        } else {
+                        } else if(redirectURI.contains("/instructor/ratings/") ||redirectURI.contains("/instructor/averageRating/") || redirectURI.contains("/instructor/freeHours") || redirectURI.equals("/rating/add") ||  redirectURI.contains("/instructor/find/") || redirectURI.equals("/vehicle/all")|| redirectURI.contains("/vehicle/find/") || redirectURI.contains("/course/vehicles/") || redirectURI.equals("/instructor/all")){
+
                         filterChain.doFilter(servletRequest, servletResponse);
-                        }
-                    System.out.println(redirectURL);
+                        }else{
+                        ((HttpServletResponse) servletResponse).sendError(401, "Unauthorized");
+                    }
+
                     }
                     if(instructor!=null) {
 
                         String instructorId = instructor.getId().toString();
-                        if (redirectURI.equals("/instructor/") || redirectURI.equals("/instructor/changePassword/") || redirectURI.equals("/instructor/lesson/accepted/") || redirectURI.equals("/instructor/lesson/waiting/") || redirectURI.equals("/instructor/notification/")|| redirectURI.equals("/instructor/notification/read/")||redirectURI.equals("/instructor/lesson/accept/")|| redirectURI.equals("/instructor/lesson/deny/") ||redirectURI.equals("/instructor/lesson/")) {
+                        if (redirectURI.equals("/instructor/") || redirectURI.equals("/instructor/find/") || redirectURI.equals("/instructor/changePassword/") || redirectURI.equals("/instructor/lesson/accepted/") || redirectURI.equals("/instructor/lesson/waiting/") || redirectURI.equals("/instructor/notification/")|| redirectURI.equals("/instructor/notification/read/")||redirectURI.equals("/instructor/lesson/accept/")|| redirectURI.equals("/instructor/lesson/deny/") ||redirectURI.equals("/instructor/lesson/")) {
 
                             filterChain.doFilter(new HttpServletRequestWrapper((HttpServletRequest) servletRequest) {
                                 @Override
@@ -86,11 +96,13 @@ public class RequestFilter implements Filter {
                                 }
                             }, servletResponse);
                         }
-                        else {
+                        else if(redirectURI.equals("/vehicle/all") || redirectURI.equals("/student/all") ){
                             filterChain.doFilter(servletRequest, servletResponse);
+                        }else{
+                            ((HttpServletResponse) servletResponse).sendError(401, "Unauthorized");
                         }
                     }
-                System.out.println(redirectURI);
+
                 } else {
                   ((HttpServletResponse) servletResponse).sendError(401, "Unauthorized");
 

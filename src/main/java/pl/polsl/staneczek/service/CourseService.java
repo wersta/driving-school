@@ -1,5 +1,7 @@
 package pl.polsl.staneczek.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import pl.polsl.staneczek.model.Course;
 import pl.polsl.staneczek.model.Student;
 import pl.polsl.staneczek.model.Vehicle;
@@ -10,12 +12,9 @@ import pl.polsl.staneczek.service.dto.VehicleDto;
 import pl.polsl.staneczek.service.mapper.CourseDtoMapper;
 import pl.polsl.staneczek.service.mapper.StudentDtoMapper;
 import pl.polsl.staneczek.service.mapper.VehicleDtoMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -40,21 +39,22 @@ public class CourseService {
     private StudentDtoMapper studentMapper;
 
 
-    public CourseDto createCourse(CourseDto dto) {
+    public Course createCourse(CourseDto dto) {
 
-        Course course=new Course();
-        course.setName(dto.getName());
-        course.setId(dto.getId());
-        course.setPrice(dto.getPrice());
-        course.setHours(dto.getHours());
-        course.setStartDate(dto.getStartDate());
-        course.setCourseType(dto.getCourseType());
-        course.setVehicleList(Collections.emptyList());
-        course.setStudentList(Collections.emptyList());
+        //Course course=new Course();
+        Course course = mapper.toEntity(dto);
+//        course.setName(dto.getName());
+//        course.setId(dto.getId());
+//        course.setPrice(dto.getPrice());
+//        course.setHours(dto.getHours());
+//        course.setStartDate(dto.getStartDate());
+//        course.setCourseType(dto.getCourseType());
+//        course.setVehicleList(Collections.emptyList());
+//        course.setStudentList(Collections.emptyList());
 
         courseRepository.save(course);
-
-        return mapper.toDto(course);
+        return course;
+        //return mapper.toDto(course);
     }
 
     public List<CourseDto> getCourseDtoList() {
@@ -65,6 +65,12 @@ public class CourseService {
             courseDtoList.add(mapper.toDto(e));
         }
         return courseDtoList;
+    }
+    public List<Course> courseList(){
+        List<Course> courseList = courseRepository.findAll();
+        if(courseList != null) {
+            return courseList;
+        }else return null;
     }
     public List<CourseDto> getActiveCourses() {
         List<Course> courseList = courseRepository.findAll();
@@ -120,7 +126,6 @@ public class CourseService {
         }
         return vehicleMapper.toDtoVehicleList(vehicleList);
     }
-
 
     public boolean deleteVehicleFromCourse(Integer courseId, Integer vehicleId) {
         Course course = findById(courseId);

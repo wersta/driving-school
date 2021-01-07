@@ -22,9 +22,11 @@ public class LoginService {
 
         User user = userService.findByEmail(email);
 
-        LoginDto loginDto=new LoginDto(null,null);
-       // user.getPassword()
-        if (user != null && user.getPassword().equals(password)) {
+        LoginDto loginDto = new LoginDto(null,null);
+
+        byte[] decodedBytes = Base64.getDecoder().decode(user.getPassword());
+        String userPassword = new String(decodedBytes);
+        if (user != null && userPassword.equals(password)) {
             request.getSession().setAttribute("email", email);
             String encodeBytes = Base64.getEncoder().encodeToString((email + ":" + password).getBytes());
             String token="Basic ".concat(encodeBytes);

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.polsl.staneczek.model.*;
 import pl.polsl.staneczek.repository.InstructorRepository;
-import pl.polsl.staneczek.repository.RatingRepository;
 import pl.polsl.staneczek.service.dto.*;
 import pl.polsl.staneczek.service.mapper.InstructorDtoMapper;
 import pl.polsl.staneczek.service.mapper.LessonDtoMapper;
@@ -12,6 +11,7 @@ import pl.polsl.staneczek.service.mapper.RatingDtoMapper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,8 +20,6 @@ public class InstructorService {
 
     @Autowired
     private InstructorRepository instructorRepository;
-    @Autowired
-    private RatingRepository ratingRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -110,16 +108,6 @@ public class InstructorService {
         return averageRating;}
     }
 
-//    public List<RatingDto> findInstructorRatingsByEmail(String email) {
-//        List<Instructor> instructorList = instructorRepository.findAll();
-//        for (Instructor e : instructorList) {
-//            if (e.getUser().getEmail().equals(email)) {
-//                return ratingMapper.toDtoRatingList(e.getRatingList());
-//            }
-//        }
-//        return null;
-//    }
-//
 
     public boolean acceptLesson(Integer instructorId, LessonDto dto) {
         Instructor instructor = findById(instructorId);
@@ -163,14 +151,6 @@ public class InstructorService {
         } else return null;
     }
 
-    public List<LessonDto>acceptedLessonList(Integer instructorId){
-        Instructor instructor = findById(instructorId);
-        if(instructor != null){
-            List<Lesson> lessonList = new ArrayList<>();
-            lessonList=lessonService.findAllByInstructorAndLessonStatusAccepted(instructor, LessonStatus.ACCEPTED);
-            return lessonMapper.toDtoLessonList(lessonList);
-        }else return null;
-    }
     public List<LessonDto>waitingLessonList(Integer instructorId){
         Instructor instructor = findById(instructorId);
         if(instructor != null){
@@ -234,15 +214,6 @@ public class InstructorService {
         }
     }
 
-//    public List<Notification> findAllNotifications(Integer instructorId) {
-//
-//        Instructor instructor = findById(instructorId);
-//        if (instructor != null) {
-//            return instructor.getNotificationList();
-//        } else {
-//            return null;
-//        }
-//    }
 
     public List<Notification> findAllUnread(Integer instructorId) {
         Instructor instructor = findById(instructorId);
@@ -261,45 +232,6 @@ public class InstructorService {
         return instructorRepository.findByUser_Id(userId).isPresent() ? instructorRepository.findByUser_Id(userId).get() : null;
     }
 
-
-//    // godziny
-//    public List<String> freeHours(DateDto dto) {
-//        Instructor instructor = findById(dto.getInstructorId());
-////        List<Lesson> lessonList = instructor.getLessonList();
-//
-//
-//        LocalDate date = LocalDate.parse(dto.getDate());
-//
-//        List<Lesson> temp = lessonService.findAllByInstructorAndDateOrderByStartTime(instructor, date);
-//        List<String> temp2 = new ArrayList<>();
-//
-//        if (temp.isEmpty()) {
-//            temp2.add("08:00 - 16:00");
-//        } else {
-//
-//            LocalTime time = LocalTime.parse("08:00");
-//
-//            for (Lesson e : temp) {
-//                LocalTime startTime = e.getStartTime();
-//                LocalTime endTime = e.getEndTime();
-//
-//                if (time.isBefore(startTime)){
-//                    temp2.add(time.toString() + " - " + startTime.toString());
-//                    time = endTime;
-//                }else{
-//                    time = endTime;
-//                }
-//            }
-//
-//            if (time.isBefore(LocalTime.parse("16:00"))){
-//                temp2.add(time.toString() + " - " + "16:00");
-//            }
-//        }
-//
-//        return temp2;
-//    }
-
-    // godziny
     public ArrayList<ArrayList<Integer> > freeHours(DateDto dto) {
         Instructor instructor = findById(dto.getInstructorId());
 
@@ -348,12 +280,11 @@ public class InstructorService {
         return outputList;
     }
 
-
-
     public boolean changePassword( Integer instructorId, UserDto dto){
-        Instructor instructor=findById(instructorId);
+        Instructor instructor = findById(instructorId);
         if(instructor != null) {
-            instructor.getUser().setPassword(dto.getPassword());
+            String encodePassword = Base64.getEncoder().encodeToString((dto.getPassword()).getBytes());
+            instructor.getUser().setPassword(encodePassword);
             instructorRepository.save(instructor);
             return true;
         }else

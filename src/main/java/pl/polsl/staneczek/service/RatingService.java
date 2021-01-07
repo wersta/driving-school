@@ -1,12 +1,12 @@
 package pl.polsl.staneczek.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import pl.polsl.staneczek.model.Instructor;
 import pl.polsl.staneczek.model.Rating;
 import pl.polsl.staneczek.repository.RatingRepository;
 import pl.polsl.staneczek.service.dto.RatingDto;
 import pl.polsl.staneczek.service.mapper.RatingDtoMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,18 +28,19 @@ public class RatingService {
         return ratingRepository.findById(ratingId).isPresent() ? ratingRepository.findById(ratingId).get() : null;
     }
 
-    public RatingDto createRating(RatingDto ratingDto)
+    public Rating createRating(RatingDto ratingDto)
     {
         Rating rating=new Rating();
         rating.setDescription(ratingDto.getDescription());
         rating.setId(ratingDto.getId());
         rating.setDate(ratingDto.getDate());
         rating.setStarsNumber(ratingDto.getStarsNumber());
-        Instructor instructor=instructorService.findById(ratingDto.getInstructorId());
+        Instructor instructor = instructorService.findById(ratingDto.getInstructorId());
         rating.setInstructor(instructor);
+        //Rating rating = ratingMapper.toEntity(ratingDto);
         ratingRepository.save(rating);
 
-        return ratingMapper.toDto(rating);
+        return rating;
     }
 
     public boolean deleteRating(Integer ratingId) {
@@ -65,12 +66,4 @@ public class RatingService {
 
     }
 
-    public RatingDto findRating(Integer ratingId)
-    {
-        Rating rating=findById(ratingId);
-        if(rating != null) {
-            return ratingMapper.toDto(rating);
-        }
-        return null;
-    }
 }

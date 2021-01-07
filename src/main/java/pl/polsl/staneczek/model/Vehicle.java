@@ -36,9 +36,9 @@ public class Vehicle {
             removeCourse(course);
         }
     }
-    public void addCourse(Course course) {
-        this.getCourseList().add(course);
-        course.getVehicleList().add(this);
-    }
+//    public void addCourse(Course course) {
+//        this.getCourseList().add(course);
+//        course.getVehicleList().add(this);
+//    }
 
 }

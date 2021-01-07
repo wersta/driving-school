@@ -18,7 +18,7 @@ public class UserSecondDto {
     @JsonProperty
     private String lastName;
     @JsonProperty
-    private Integer id;//id studenta lub insructora
+    private Integer id;
     @JsonProperty
     private Address address;
 
